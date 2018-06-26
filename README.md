@@ -18,3 +18,5 @@ The toolbox propose a set of musically informed objective measures to obtain ana
 2. Relative metrics in order to compare two sets of data, e.g., training and generated.
 
 ## Instruction:
+
+Current under version update, will be available shortly
