@@ -19,4 +19,4 @@ The toolbox propose a set of musically informed objective measures to obtain ana
 
 ## Instruction:
 
-Current under version update, will be available shortly
+Demonstration of metrics included in demo.ipynb
