@@ -11,7 +11,7 @@ import metrics as mt
 
 
 # Calculate overlap between the two PDF
-def overlap(A, B):
+def overlap_area(A, B):
     pdf_A = stats.gaussian_kde(A)
     pdf_B = stats.gaussian_kde(B)
     d_area = lambda x: min(pdf_A(x), pdf_B(x))
@@ -19,7 +19,7 @@ def overlap(A, B):
 
 
 # Calculate KL distance between the two PDF
-def _KL(A, B, num_sample=1000):
+def kl_dist(A, B, num_sample=1000):
     pdf_A = stats.gaussian_kde(A)
     pdf_B = stats.gaussian_kde(B)
     sample_A = np.linspace(np.min(A), np.max(A), num_sample)
@@ -27,7 +27,7 @@ def _KL(A, B, num_sample=1000):
     return stats.entropy(pdf_A(sample_A), pdf_B(sample_B))
 
 
-def _cdist(A, B, mode='None', normalize=0):
+def c_dist(A, B, mode='None', normalize=0):
     c_dist = np.zeros(len(B))
     for i in range(0, len(B)):
         if mode == 'None':
