@@ -19,4 +19,4 @@ The toolbox propose a set of musically informed objective measures to obtain ana
 
 ## Instruction:
 
-Demonstration of metrics included in demo.ipynb
+Demonstration of metrics included in [demo.ipynb](https://github.com/RichardYang40148/mgeval/commits?author=RichardYang40148)
