@@ -17,6 +17,19 @@ The toolbox propose a set of musically informed objective measures to obtain ana
  
 2. Relative metrics in order to compare two sets of data, e.g., training and generated.
 
-## Instruction:
+### Musically informed objective measures
+
+1. Pitch count: The number of different pitches within a sample. The output is a scalar for each sample.
+2. Pitch class histogram: The pitch class histogram is an octave-independent representation of the pitch content with a dimensionality of 12 for a chromatic scale. In our case, it represents to the octave-independent chromatic quantization of the frequency continuum.
+3. Pitch class transition matrix: The transition of pitch classes contains useful information for tasks such as key detection, chord recognition, or genre pattern recognition. The two-dimensional pitch class transition matrix is a histogram-like representation computed by counting the pitch transitions for each (ordered) pair of notes. The resulting feature dimensionality is 12 × 12.
+4. Pitch range: The pitch range is calculated by subtraction of the highest and lowest used pitch in semitones. The output is a scalar for each sample.
+5. Average pitch interval: Average value of the interval between two consecutive pitches in semitones. The output is a scalar for each sample.
+
+1. Note count: The number of used notes. As opposed to the pitch count, the note count does not contain pitch information but is a rhythm-related feature. The output is a scalar for each sample.
+2. Average inter-onset-interval: To calculate the inter-onset-interval in the symbolic music domain, we find the time between two consecutive notes. The output is a scalar in seconds for each sample.
+3. Note length histogram: To extract the note length histogram, we first define a set of allowable beat length classes [full, half, quarter, 8th, 16th, dot half, dot quarter, dot 8th, dot 16th, half note triplet, quarter note triplet, 8th note triplet]. The rest option, when activated, will double the vector size to represent the same lengths for rests. The classification of each event is performed by dividing the basic unit into the length of (barlength)/96, and each note length is quantized to the closest length category. The output vector has a length of either 12 or 24, respectively.
+4. Note length transition matrix: Similar to the pitch class transition matrix, the note length tran- sition matrix provides useful information for rhythm description. The output feature dimension is 12 × 12 or 24 × 24, respectively.
+
+### Demonstration of metrics
 
 Demonstration of metrics included in [demo.ipynb](https://github.com/RichardYang40148/mgeval/commits?author=RichardYang40148)
