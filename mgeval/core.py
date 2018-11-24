@@ -7,14 +7,19 @@ import glob
 import math
 
 
-class metrics(object):
+def extract_feature(_file):
+    feature = {'pretty_midi': pretty_midi.PrettyMIDI(_file),
+               'midi_pattern': midi.read_midifile(_file)}
+    return feature
 
-    def total_used_pitch(self, piano_roll):  # return a tuple
+class metrics(object):
+    def total_used_pitch(self, feature):  # return a tuple
+        piano_roll = feature['pretty_midi'].instruments[0].get_piano_roll(fs=100)
         sum_notes = np.sum(piano_roll, axis=1)
         return np.sum(sum_notes > 0)
 
-    def bar_used_pitch(self, pattern, track_num=0, num_bar=False):   # return [num_bar,used_pitch]
-
+    def bar_used_pitch(self, feature, track_num=0, num_bar=False):   # return [num_bar,used_pitch]
+        pattern = feature['midi_pattern']
         pattern.make_ticks_abs()
         resolution = pattern.resolution
         for i in range(0, len(pattern[track_num])):
@@ -59,14 +64,16 @@ class metrics(object):
 
         return used_pitch
 
-    def total_used_note(self, pattern, track_num=0):  # return a tuple
+    def total_used_note(self, feature, track_num=0):  # return a tuple
+        pattern = feature['midi_pattern']
         notes = 0
         for i in range(0, len(pattern[track_num])):
             if type(pattern[track_num][i]) == midi.events.NoteOnEvent and pattern[track_num][i].data[1] != 0:
                 notes += 1
         return notes
 
-    def bar_used_note(self, pattern, track_num=0, num_bar=False):  # return shape [num_bar,used_notes]
+    def bar_used_note(self, feature, track_num=0, num_bar=False):  # return shape [num_bar,used_notes]
+        pattern = feature['midi_pattern']
         pattern.make_ticks_abs()
         resolution = pattern.resolution
         for i in range(0, len(pattern[track_num])):
@@ -96,7 +103,8 @@ class metrics(object):
                     used_notes[pattern[track_num][i].tick / bar_length] += 1
         return used_notes
 
-    def total_pitch_class_histogram(self, piano_roll):  # return histrogram of 12 pitch, with weighted duration shape 12
+    def total_pitch_class_histogram(self, feature):  # return histrogram of 12 pitch, with weighted duration shape 12
+        piano_roll = feature['pretty_midi'].instruments[0].get_piano_roll(fs=100)
         histogram = np.zeros(12)
         for i in range(0, 128):
             pitch_class = i % 12
@@ -104,8 +112,9 @@ class metrics(object):
 
         return histogram / sum(histogram)
 
-    def bar_pitch_class_histogram(self, pm_object, bpm=120, num_bar=False, track_num=0):  # return shape [num_bar, 12]
+    def bar_pitch_class_histogram(self, feature, bpm=120, num_bar=False, track_num=0):  # return shape [num_bar, 12]
         # todo: deal with more than one time signature cases
+        pm_object = feature['pretty_midi']
         if num_bar is False:
             numer = pm_object.time_signature_changes[-1].numerator
             deno = pm_object.time_signature_changes[-1].denominator
@@ -144,7 +153,8 @@ class metrics(object):
                 bar_histogram[i] = np.zeros(12)
         return bar_histogram
 
-    def pitch_class_transition_matrix(self, pm_object, normalize=0):  # return shape [12, 12]
+    def pitch_class_transition_matrix(self, feature, normalize=0):  # return shape [12, 12]
+        pm_object = feature['pretty_midi']
         transition_matrix = pm_object.get_pitch_class_transition_matrix()
 
         if normalize == 0:
@@ -162,12 +172,14 @@ class metrics(object):
             print "invalid normalization mode, return unnormalized matrix"
             return transition_matrix
 
-    def pitch_range(self, piano_roll):
+    def pitch_range(self, feature):
+        piano_roll = feature['pretty_midi'].instruments[0].get_piano_roll(fs=100)
         used_pitch = np.sum(piano_roll, axis=1) > 0
         pitch_index = np.where(used_pitch is True)
         return np.max(pitch_index) - np.min(pitch_index)
 
-    def chord_dependency(self, pm_object, bar_chord, bpm=120, num_bar=False, track_num=0):  # return tuple
+    def chord_dependency(self, feature, bar_chord, bpm=120, num_bar=False, track_num=0):  # return tuple
+        pm_object = feature['pretty_midi']
         # compare bar chroma with chord chroma. calculate the ecludian
         bar_pitch_class_histogram = self.bar_pitch_class_histogram(pm_object, bpm=bpm, num_bar=num_bar, track_num=track_num)
         dist = np.zeros((len(bar_pitch_class_histogram)))
@@ -176,7 +188,8 @@ class metrics(object):
         average_dist = np.mean(dist)
         return average_dist
 
-    def avg_pitch_shift(self, pattern, track_num=0):  # return tuple
+    def avg_pitch_shift(self, feature, track_num=0):  # return tuple
+        pattern = feature['midi_pattern']
         pattern.make_ticks_abs()
         resolution = pattern.resolution
         total_used_note = self.total_used_note(pattern, track_num=track_num)
@@ -194,14 +207,16 @@ class metrics(object):
                     counter += 1
         return np.mean(abs(d_note))
 
-    def avg_IOI(self, pm_object):
+    def avg_IOI(self, feature):
+        pm_object = feature['pretty_midi']
         onset = pm_object.get_onsets()
         ioi = np.diff(onset)
         return np.mean(ioi)
 
     # define: [full, half, quarter, 8th, 16th, dot_half, dot_quarter, dot_8th, dot_16th, half note triplet, quarter note triplet, 8th note triplet, others]
 
-    def note_length_hist(self, pattern, track_num=0, normalize=True, pause_event=False):
+    def note_length_hist(self, feature, track_num=0, normalize=True, pause_event=False):
+        pattern = feature['midi_pattern']
         if pause_event is False:
             note_length_hist = np.zeros((12))
             pattern.make_ticks_abs()
@@ -285,7 +300,8 @@ class metrics(object):
 
             return note_length_hist / np.sum(note_length_hist)
 
-    def note_length_transition_matrix(self, pattern, track_num=0, normalize=0, pause_event=False):
+    def note_length_transition_matrix(self, feature, track_num=0, normalize=0, pause_event=False):
+        pattern = feature['midi_pattern']
         if pause_event is False:
             transition_matrix = np.zeros((12, 12))
             pattern.make_ticks_abs()
