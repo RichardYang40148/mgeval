@@ -7,7 +7,6 @@ import glob
 import math
 import sklearn
 from scipy import stats, integrate
-import metrics as mt
 
 
 # Calculate overlap between the two PDF
