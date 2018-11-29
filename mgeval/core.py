@@ -12,13 +12,14 @@ def extract_feature(_file):
                'midi_pattern': midi.read_midifile(_file)}
     return feature
 
+
 class metrics(object):
     def total_used_pitch(self, feature):  # return a tuple
         piano_roll = feature['pretty_midi'].instruments[0].get_piano_roll(fs=100)
         sum_notes = np.sum(piano_roll, axis=1)
         return np.sum(sum_notes > 0)
 
-    def bar_used_pitch(self, feature, track_num=0, num_bar=False):   # return [num_bar,used_pitch]
+    def bar_used_pitch(self, feature, track_num=1, num_bar=False):   # return [num_bar,used_pitch]
         pattern = feature['midi_pattern']
         pattern.make_ticks_abs()
         resolution = pattern.resolution
