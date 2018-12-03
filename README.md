@@ -31,5 +31,9 @@ The toolbox propose a set of musically informed objective measures to obtain ana
 4. Note length transition matrix: Similar to the pitch class transition matrix, the note length tran- sition matrix provides useful information for rhythm description. The output feature dimension is 12 × 12 or 24 × 24, respectively.
 
 ### Demonstration of metrics
-
+ * [`scipy`](http://www.scipy.org/)
+ * [`numpy`](http://www.numpy.org)
+ * [`pretty-midi`](https://github.com/craffel/pretty-midi)
+ * [`python-midi`](https://github.com/vishnubob/python-midi)
+ * [`sklearn`](https://scikit-learn.org/stable/)
 Demonstration of metrics included in [demo.ipynb](https://github.com/RichardYang40148/mgeval/commits?author=RichardYang40148)
