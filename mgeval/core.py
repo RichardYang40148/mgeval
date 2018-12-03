@@ -1,3 +1,4 @@
+# coding:utf-8
 """core.py
 Include feature extractor and musically informed objective measures.
 """
