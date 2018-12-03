@@ -1,11 +1,13 @@
-import pretty_midi
-import numpy as np
+# coding:utf-8
+"""utils.py
+Include distance calculation for evaluation metrics
+"""
 import sys
 import os
-import midi
 import glob
 import math
 import sklearn
+import numpy as np
 from scipy import stats, integrate
 
 
@@ -13,8 +15,7 @@ from scipy import stats, integrate
 def overlap_area(A, B):
     pdf_A = stats.gaussian_kde(A)
     pdf_B = stats.gaussian_kde(B)
-    d_area = lambda x: min(pdf_A(x), pdf_B(x))
-    return integrate.quad(d_area, np.min((np.min(A), np.min(B))), np.max((np.max(A), np.max(B))))[0]
+    return integrate.quad(lambda x: min(pdf_A(x), pdf_B(x)), np.min((np.min(A), np.min(B))), np.max((np.max(A), np.max(B))))[0]
 
 
 # Calculate KL distance between the two PDF
