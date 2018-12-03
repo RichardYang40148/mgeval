@@ -44,6 +44,10 @@ class metrics(object):
         """
         bar_used_pitch (Pitch count per bar)
 
+        Args:
+        'track_num' : specify the track number in the midi pattern, default is 1 (the second track).
+        'num_bar': specify the number of bars in the midi pattern, if set as None, round to the number of complete bar.
+
         Returns:
         'used_pitch': with shape of [num_bar,1]
         """
@@ -65,7 +69,7 @@ class metrics(object):
                     bar_length = 4 * resolution
                     time_sig = [4, 2, 24, 8]
 
-                    if num_bar is False:
+                    if num_bar is None:
                         num_bar = int(round(float(pattern[track_num][-1].tick) / bar_length))
                         used_notes = np.zeros((num_bar, 1))
                         used_notes[pattern[track_num][i].tick / bar_length] += 1
@@ -92,10 +96,13 @@ class metrics(object):
 
         return used_pitch
 
-    def total_used_note(self, feature, track_num=0):
+    def total_used_note(self, feature, track_num=1):
         """
         total_used_note (Note count): The number of used notes.
         As opposed to the pitch count, the note count does not contain pitch information but is a rhythm-related feature.
+
+        Args:
+        'track_num' : specify the track number in the midi pattern, default is 1 (the second track).
 
         Returns:
         'used_notes': a scalar for each sample.
@@ -107,9 +114,13 @@ class metrics(object):
                 used_notes += 1
         return used_notes
 
-    def bar_used_note(self, feature, track_num=0, num_bar=False):
+    def bar_used_note(self, feature, track_num=1, num_bar=None):
         """
         bar_used_note (Note count per bar).
+
+        Args:
+        'track_num' : specify the track number in the midi pattern, default is 1 (the second track).
+        'num_bar': specify the number of bars in the midi pattern, if set as None, round to the number of complete bar.
 
         Returns:
         'used_notes': with shape of [num_bar, 1]
@@ -121,7 +132,7 @@ class metrics(object):
             if type(pattern[track_num][i]) == midi.events.TimeSignatureEvent:
                 time_sig = pattern[track_num][i].data
                 bar_length = time_sig[track_num] * resolution * 4 / 2**(time_sig[1])
-                if num_bar is False:
+                if num_bar is None:
                     num_bar = int(round(float(pattern[track_num][-1].tick) / bar_length))
                     used_notes = np.zeros((num_bar, 1))
                 else:
@@ -132,7 +143,7 @@ class metrics(object):
                     bar_length = 4 * resolution
                     time_sig = [4, 2, 24, 8]
 
-                    if num_bar is False:
+                    if num_bar is None:
                         num_bar = int(round(float(pattern[track_num][-1].tick) / bar_length))
                         used_notes = np.zeros((num_bar, 1))
                         used_notes[pattern[track_num][i].tick / bar_length] += 1
@@ -150,7 +161,6 @@ class metrics(object):
         The pitch class histogram is an octave-independent representation of the pitch content with a dimensionality of 12 for a chromatic scale.
         In our case, it represents to the octave-independent chromatic quantization of the frequency continuum.
 
-
         Returns:
         'histogram': histrogram of 12 pitch, with weighted duration shape 12
         """
@@ -162,9 +172,14 @@ class metrics(object):
         histogram = histogram / sum(histogram)
         return histogram
 
-    def bar_pitch_class_histogram(self, feature, bpm=120, num_bar=False, track_num=0):  # return shape [num_bar, 12]
+    def bar_pitch_class_histogram(self, feature, track_num=1, bpm=120, num_bar=None):
         """
         bar_pitch_class_histogram (Pitch class histogram per bar):
+
+        Args:
+        'bpm' : specify the assigned speed in bpm, default is 120 bpm.
+        'num_bar': specify the number of bars in the midi pattern, if set as None, round to the number of complete bar.
+        'track_num' : specify the track number in the midi pattern, default is 1 (the second track).
 
         Returns:
         'histogram': with shape of [num_bar, 12]
@@ -172,7 +187,7 @@ class metrics(object):
 
         # todo: deal with more than one time signature cases
         pm_object = feature['pretty_midi']
-        if num_bar is False:
+        if num_bar is None:
             numer = pm_object.time_signature_changes[-1].numerator
             deno = pm_object.time_signature_changes[-1].denominator
             bar_length = 60. / bpm * numer * 4 / deno * 100
@@ -216,6 +231,10 @@ class metrics(object):
         The transition of pitch classes contains useful information for tasks such as key detection, chord recognition, or genre pattern recognition.
         The two-dimensional pitch class transition matrix is a histogram-like representation computed by counting the pitch transitions for each (ordered) pair of notes.
 
+        Args:
+        'normalize' : If set to 0, return transition without normalization.
+                      If set to 1, normalizae by row.
+                      If set to 2, normalize by entire matrix sum.
         Returns:
         'transition_matrix': shape of [12, 12], transition_matrix of 12 x 12.
         """
@@ -251,20 +270,13 @@ class metrics(object):
         p_range = np.max(pitch_index) - np.min(pitch_index)
         return p_range
 
-    def chord_dependency(self, feature, bar_chord, bpm=120, num_bar=False, track_num=0):  # return tuple
-        pm_object = feature['pretty_midi']
-        # compare bar chroma with chord chroma. calculate the ecludian
-        bar_pitch_class_histogram = self.bar_pitch_class_histogram(pm_object, bpm=bpm, num_bar=num_bar, track_num=track_num)
-        dist = np.zeros((len(bar_pitch_class_histogram)))
-        for i in range((len(bar_pitch_class_histogram))):
-            dist[i] = np.linalg.norm(bar_pitch_class_histogram[i] - bar_chord[i])
-        average_dist = np.mean(dist)
-        return average_dist
-
-    def avg_pitch_shift(self, feature, track_num=0):
+    def avg_pitch_shift(self, feature, track_num=1):
         """
         avg_pitch_shift (Average pitch interval):
         Average value of the interval between two consecutive pitches in semitones.
+
+        Args:
+        'track_num' : specify the track number in the midi pattern, default is 1 (the second track).
 
         Returns:
         'pitch_shift': a scalar for each sample.
@@ -297,20 +309,24 @@ class metrics(object):
         'avg_ioi': a scalar for each sample.
         """
 
-
         pm_object = feature['pretty_midi']
         onset = pm_object.get_onsets()
         ioi = np.diff(onset)
         avg_ioi = np.mean(ioi)
         return avg_ioi
 
-    def note_length_hist(self, feature, track_num=0, normalize=True, pause_event=False):
+    def note_length_hist(self, feature, track_num=1, normalize=True, pause_event=False):
         """
         note_length_hist (Note length histogram):
         To extract the note length histogram, we first define a set of allowable beat length classes:
         [full, half, quarter, 8th, 16th, dot half, dot quarter, dot 8th, dot 16th, half note triplet, quarter note triplet, 8th note triplet].
         The pause_event option, when activated, will double the vector size to represent the same lengths for rests.
         The classification of each event is performed by dividing the basic unit into the length of (barlength)/96, and each note length is quantized to the closest length category.
+
+        Args:
+        'track_num' : specify the track number in the midi pattern, default is 1 (the second track).
+        'normalize' : If true, normalize by vector sum.
+        'pause_event' : when activated, will double the vector size to represent the same lengths for rests.
 
         Returns:
         'note_length_hist': The output vector has a length of either 12 (or 24 when pause_event is True).
@@ -400,11 +416,19 @@ class metrics(object):
 
             return note_length_hist / np.sum(note_length_hist)
 
-    def note_length_transition_matrix(self, feature, track_num=0, normalize=0, pause_event=False):
+    def note_length_transition_matrix(self, feature, track_num=1, normalize=0, pause_event=False):
         """
         note_length_transition_matrix (Note length transition matrix):
         Similar to the pitch class transition matrix, the note length tran- sition matrix provides useful information for rhythm description.
 
+        Args:
+        'track_num' : specify the track number in the midi pattern, default is 1 (the second track).
+        'normalize' : If true, normalize by vector sum.
+        'pause_event' : when activated, will double the vector size to represent the same lengths for rests.
+
+        'normalize' : If set to 0, return transition without normalization.
+                      If set to 1, normalizae by row.
+                      If set to 2, normalize by entire matrix sum.
 
         Returns:
         'transition_matrix': The output feature dimension is 12 × 12 (or 24 x 24 when pause_event is True).
@@ -512,3 +536,13 @@ class metrics(object):
         else:
             print "invalid normalization mode, return unnormalized matrix"
             return transition_matrix
+
+    def chord_dependency(self, feature, bar_chord, bpm=120, num_bar=None, track_num=1):
+        pm_object = feature['pretty_midi']
+        # compare bar chroma with chord chroma. calculate the ecludian
+        bar_pitch_class_histogram = self.bar_pitch_class_histogram(pm_object, bpm=bpm, num_bar=num_bar, track_num=track_num)
+        dist = np.zeros((len(bar_pitch_class_histogram)))
+        for i in range((len(bar_pitch_class_histogram))):
+            dist[i] = np.linalg.norm(bar_pitch_class_histogram[i] - bar_chord[i])
+        average_dist = np.mean(dist)
+        return average_dist
