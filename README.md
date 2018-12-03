@@ -1,7 +1,10 @@
 # mgeval
 
-An Objective evaluation toolbox for symbolic domain music generation
-Published as [On the evaluation of generative models in music](https://link.springer.com/article/10.1007/s00521-018-3849-7?wt_mc=Internal.Event.1.SEM.ArticleAuthorOnlineFirst&utm_source=ArticleAuthorOnlineFirst&utm_medium=email&utm_content=AA_en_06082018&ArticleAuthorOnlineFirst_20181106)
+An Objective evaluation toolbox for symbolic domain music generation.
+
+The work is published as [On the evaluation of generative models in music](https://link.springer.com/article/10.1007/s00521-018-3849-7?wt_mc=Internal.Event.1.SEM.ArticleAuthorOnlineFirst&utm_source=ArticleAuthorOnlineFirst&utm_medium=email&utm_content=AA_en_06082018&ArticleAuthorOnlineFirst_20181106)
+
+[Paper access](https://link.springer.com/epdf/10.1007/s00521-018-3849-7?author_access_token=Z7YxQv2K9z33nk1_XGlY9_e4RwlQNchNByi7wbcMAY5M_T6iwDlmVavmHfG20IIuk492IRWVj17BK1zhOxg5HA5fo8df4mI0b3U1YbTvprNarTF7BunHbKBquKplW2anwIy_TzUtUKq8g6tZzhCUzQ%3D%3D)
 
 ## Introduction:
 
