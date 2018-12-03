@@ -41,6 +41,6 @@ The toolbox propose a set of musically informed objective measures to obtain ana
  * [`python-midi`](https://github.com/vishnubob/python-midi)
  * [`sklearn`](https://scikit-learn.org/stable/)
  ### To use
- Detailed documentation included [here](Musically informed objective measures).
+ Detailed documentation included [here](https://github.com/RichardYang40148/mgeval/blob/master/mgeval/documentation.md).
  
  Demonstration of metrics included in [demo.ipynb](https://github.com/RichardYang40148/mgeval/commits?author=RichardYang40148)
