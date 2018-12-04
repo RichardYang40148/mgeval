@@ -112,8 +112,8 @@ Returns:
 ### avg_IOI (Average inter-onset-interval):
 To calculate the inter-onset-interval in the symbolic music domain, we find the time between two consecutive notes.
 ```
-        Returns:
-        'avg_ioi': a scalar for each sample.
+Returns:
+'avg_ioi': a scalar for each sample.
 ```
 
 ### note_length_hist (Note length histogram):
