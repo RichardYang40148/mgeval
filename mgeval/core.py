@@ -266,8 +266,7 @@ class metrics(object):
         'p_range': a scalar for each sample.
         """
         piano_roll = feature['pretty_midi'].instruments[0].get_piano_roll(fs=100)
-        used_pitch = np.sum(piano_roll, axis=1) > 0
-        pitch_index = np.where(used_pitch is True)
+        pitch_index = np.where(np.sum(piano_roll, axis=1) > 0)
         p_range = np.max(pitch_index) - np.min(pitch_index)
         return p_range
 
