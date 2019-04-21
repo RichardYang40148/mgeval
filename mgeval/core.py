@@ -284,7 +284,7 @@ class metrics(object):
         pattern = feature['midi_pattern']
         pattern.make_ticks_abs()
         resolution = pattern.resolution
-        total_used_note = self.total_used_note(pattern, track_num=track_num)
+        total_used_note = self.total_used_note(feature, track_num=track_num)
         d_note = np.zeros((total_used_note - 1))
         current_note = 0
         counter = 0
@@ -537,12 +537,12 @@ class metrics(object):
             print "invalid normalization mode, return unnormalized matrix"
             return transition_matrix
 
-    def chord_dependency(self, feature, bar_chord, bpm=120, num_bar=None, track_num=1):
-        pm_object = feature['pretty_midi']
-        # compare bar chroma with chord chroma. calculate the ecludian
-        bar_pitch_class_histogram = self.bar_pitch_class_histogram(pm_object, bpm=bpm, num_bar=num_bar, track_num=track_num)
-        dist = np.zeros((len(bar_pitch_class_histogram)))
-        for i in range((len(bar_pitch_class_histogram))):
-            dist[i] = np.linalg.norm(bar_pitch_class_histogram[i] - bar_chord[i])
-        average_dist = np.mean(dist)
-        return average_dist
+    # def chord_dependency(self, feature, bar_chord, bpm=120, num_bar=None, track_num=1):
+    #     pm_object = feature['pretty_midi']
+    #     # compare bar chroma with chord chroma. calculate the ecludian
+    #     bar_pitch_class_histogram = self.bar_pitch_class_histogram(pm_object, bpm=bpm, num_bar=num_bar, track_num=track_num)
+    #     dist = np.zeros((len(bar_pitch_class_histogram)))
+    #     for i in range((len(bar_pitch_class_histogram))):
+    #         dist[i] = np.linalg.norm(bar_pitch_class_histogram[i] - bar_chord[i])
+    #     average_dist = np.mean(dist)
+    #     return average_dist
