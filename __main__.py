@@ -22,7 +22,7 @@ parser.add_argument('--outfile', required=True, type=str,
 args = parser.parse_args()
 
 # set1 = glob.glob('data/output/*')
-print('Starting analysis of {} against {}'.format(args.set1dir, args.set2dir))
+# print('Starting analysis of {} against {}'.format(args.set1dir, args.set2dir))
 
 # set1 = glob.glob(os.path.join(args.set1dir, '*'))
 set1 = glob.glob(os.path.join(args.set1dir, '*'))
@@ -32,25 +32,23 @@ set2 = glob.glob(os.path.join(args.set2dir, '*'))
 # print('set2 has {} elements'.format(len(set2)))
 
 num_samples = min(len(set2), len(set1))
-print('num_samples is {}'.format(num_samples))
-
 
 evalset = { 
             'total_used_pitch': np.zeros((num_samples, 1))
-          , 'total_used_note': np.zeros((num_samples, 1))
+          # , 'total_used_note': np.zeros((num_samples, 1))
           , 'pitch_range': np.zeros((num_samples, 1))
-          , 'avg_pitch_shift': np.zeros((num_samples, 1))
+          # , 'avg_pitch_shift': np.zeros((num_samples, 1))
           , 'avg_IOI': np.zeros((num_samples, 1))
           # , 'total_used_note': np.zeros((num_samples, 1))
           # , 'bar_used_pitch': np.zeros((num_samples, 1))
           # , 'bar_used_note': np.zeros((num_samples, 1))
           # , 'total_pitch_class_histogram': np.zeros((num_samples, 1))
           # , 'bar_pitch_class_histogram': np.zeros((num_samples, 1))
-          # , 'pitch_class_transition_matrix': np.zeros((num_samples, 1))
+          , 'pitch_class_transition_matrix': np.zeros((num_samples, 12, 12))
           # , 'note_length_hist': np.zeros((num_samples, 1))
-          # , 'note_length_transition_matrix': np.zeros((num_samples, 1))
+          , 'note_length_transition_matrix': np.zeros((num_samples, 12, 12))
           }
-
+metrics_list = evalset.keys()
 
 single_arg_metrics = (
     [ 'total_used_pitch'
@@ -61,7 +59,6 @@ single_arg_metrics = (
     ])
 
 set1_eval = evalset.copy()
-metrics_list = set1_eval.keys()
 for i in range(0, num_samples):
     feature = core.extract_feature(set1[i])
     for metric in metrics_list:
@@ -85,20 +82,21 @@ for i in range(0, num_samples):
 
 for metric in metrics_list:
     print metric + ':'
-    print '------------------------'
-    print ' demo_set'
-    print '  mean: ', np.mean(set1_eval[metric], axis=0)
-    print '  std: ', np.std(set1_eval[metric], axis=0)
+    # print '------------------------'
+    # print ' demo_set'
+    # print '  mean: ', np.mean(set1_eval[metric], axis=0)
+    # print '  std: ', np.std(set1_eval[metric], axis=0)
 
-    print '------------------------'
-    print ' demo_set'
-    print '  mean: ', np.mean(set2_eval[metric], axis=0)
-    print '  std: ', np.std(set2_eval[metric], axis=0)
+    # print '------------------------'
+    # print ' demo_set'
+    # print '  mean: ', np.mean(set2_eval[metric], axis=0)
+    # print '  std: ', np.std(set2_eval[metric], axis=0)
+
 
 loo = LeaveOneOut()
 loo.get_n_splits(np.arange(num_samples))
-set1_intra = np.zeros((num_samples, len(metrics_list), num_samples-1))
-set2_intra = np.zeros((num_samples, len(metrics_list), num_samples-1))
+set1_intra = np.zeros((num_samples, len(metrics_list), num_samples - 1))
+set2_intra = np.zeros((num_samples, len(metrics_list), num_samples - 1))
 for i in range(len(metrics_list)):
     for train_index, test_index in loo.split(np.arange(num_samples)):
         set1_intra[test_index[0]][i] = utils.c_dist(
@@ -128,23 +126,28 @@ plot_sets_inter = np.transpose(
 
 output = {}
 for i, metric in enumerate(metrics_list):
-    print('')
-    print('plot_set1_intra[{}]'.format(i))
-    print(plot_set1_intra[i])
-    print('plot_set2_intra[{}]'.format(i))
-    print(plot_set2_intra[i])
-    print('plot_sets_inter[{}]'.format(i))
-    print(plot_sets_inter[i])
+    # print('')
+    # print('plot_set1_intra[{}]'.format(i))
+    # print(plot_set1_intra[i])
+    # print('plot_set2_intra[{}]'.format(i))
+    # print(plot_set2_intra[i])
+    # print('plot_sets_inter[{}]'.format(i))
+    # print(plot_sets_inter[i])
 
-    print metrics_list[i] + ':'
-    print '------------------------'
-    print ' demo_set1'
-    print '  Kullback–Leibler divergence:', utils.kl_dist(plot_set1_intra[i], plot_sets_inter[i])
-    print '  Overlap area:', utils.overlap_area(plot_set1_intra[i], plot_sets_inter[i])
+    # print metrics_list[i] + ':'
+    # print '------------------------'
+    # print ' demo_set1'
+    # print '  Kullback–Leibler divergence:', utils.kl_dist(plot_set1_intra[i], plot_sets_inter[i])
+    # print '  Overlap area:', utils.overlap_area(plot_set1_intra[i], plot_sets_inter[i])
 
-    print ' demo_set2'
-    print '  Kullback–Leibler divergence:', utils.kl_dist(plot_set2_intra[i], plot_sets_inter[i])
-    print '  Overlap area:', utils.overlap_area(plot_set2_intra[i], plot_sets_inter[i])
+    # print ' demo_set2'
+    # print '  Kullback–Leibler divergence:', utils.kl_dist(plot_set2_intra[i], plot_sets_inter[i])
+    # print '  Overlap area:', utils.overlap_area(plot_set2_intra[i], plot_sets_inter[i])
+
+    # FIXME: Remove this
+    # plot_set1_intra[i] = np.nan_to_num(plot_set1_intra[i]) + 1
+    # plot_set2_intra[i] = np.nan_to_num(plot_set2_intra[i]) + 1
+    # plot_sets_inter[i] = np.nan_to_num(plot_sets_inter[i]) + 1
 
     kl1 = utils.kl_dist(plot_set1_intra[i], plot_sets_inter[i])
     ol1 = utils.overlap_area(plot_set1_intra[i], plot_sets_inter[i])

@@ -285,7 +285,10 @@ class metrics(object):
         pattern.make_ticks_abs()
         resolution = pattern.resolution
         total_used_note = self.total_used_note(feature, track_num=track_num)
-        d_note = np.zeros((total_used_note - 1))
+        d_note = np.zeros((max(total_used_note - 1, 0)))
+        # if total_used_note == 0:
+          # return 0
+        # d_note = np.zeros((total_used_note - 1))
         current_note = 0
         counter = 0
         for i in range(0, len(pattern[track_num])):
