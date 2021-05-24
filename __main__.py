@@ -42,7 +42,7 @@ evalset = {
           # , 'total_used_note': np.zeros((num_samples, 1))
           # , 'bar_used_pitch': np.zeros((num_samples, 1))
           # , 'bar_used_note': np.zeros((num_samples, 1))
-          # , 'total_pitch_class_histogram': np.zeros((num_samples, 1))
+          , 'total_pitch_class_histogram': np.zeros((num_samples, 12))
           # , 'bar_pitch_class_histogram': np.zeros((num_samples, 1))
           , 'pitch_class_transition_matrix': np.zeros((num_samples, 12, 12))
           # , 'note_length_hist': np.zeros((num_samples, 1))
