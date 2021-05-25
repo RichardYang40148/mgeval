@@ -30,10 +30,13 @@ args = parser.parse_args()
 set1 = glob.glob(os.path.join(args.set1dir, '*'))
 set2 = glob.glob(os.path.join(args.set2dir, '*'))
 
-
+print(set1)
+print(set2)
 
 # Initialize Evaluation Set
 num_samples = min(len(set2), len(set1))
+
+print(num_samples)
 evalset = { 
             'total_used_pitch': np.zeros((num_samples, 1))
           , 'pitch_range': np.zeros((num_samples, 1))
