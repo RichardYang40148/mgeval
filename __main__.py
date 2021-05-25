@@ -21,67 +21,73 @@ parser.add_argument('--set2dir', required=True, type=str,
                     help='Path (absolute) to the second dataset (folder)')
 parser.add_argument('--outfile', required=True, type=str,
                     help='File (pickle) where the analysis will be stored')
+
+parser.add_argument('--num-bar', required=False, type=int, default=None,
+                    help='Number of bars to account for during processing')
+
 args = parser.parse_args()
 
 set1 = glob.glob(os.path.join(args.set1dir, '*'))
 set2 = glob.glob(os.path.join(args.set2dir, '*'))
 
 
+
+# Initialize Evaluation Set
 num_samples = min(len(set2), len(set1))
 evalset = { 
             'total_used_pitch': np.zeros((num_samples, 1))
-          # , 'total_used_note': np.zeros((num_samples, 1))
           , 'pitch_range': np.zeros((num_samples, 1))
           # , 'avg_pitch_shift': np.zeros((num_samples, 1))
           , 'avg_IOI': np.zeros((num_samples, 1))
           # , 'total_used_note': np.zeros((num_samples, 1))
-          # , 'bar_used_pitch': np.zeros((num_samples, 1, 1))
-          # , 'bar_used_note': np.zeros((num_samples, 1))
+          # , 'bar_used_pitch': np.zeros((num_samples, args.num_bar, 1, 1))
+          # , 'bar_used_note': np.zeros((num_samples, args.num_bar, 1))
           , 'total_pitch_class_histogram': np.zeros((num_samples, 12))
-          # , 'bar_pitch_class_histogram': np.zeros((num_samples, 1))
-          # , 'note_length_hist': np.zeros((num_samples, 12))
+          , 'bar_pitch_class_histogram': np.zeros((num_samples, args.num_bar, 12))
+          , 'note_length_hist': np.zeros((num_samples, 12))
           , 'pitch_class_transition_matrix': np.zeros((num_samples, 12, 12))
           # , 'note_length_transition_matrix': np.zeros((num_samples, 12, 12))
           }
+
+bar_metrics = [ 'bar_used_pitch', 'bar_used_note', 'bar_pitch_class_histogram' ]
+
+for metric in bar_metrics:
+  print(args.num_bar)
+  if not args.num_bar:
+    evalset.pop(metric)
+
+# print(evalset)
+
 metrics_list = evalset.keys()
 
 single_arg_metrics = (
     [ 'total_used_pitch'
     , 'avg_IOI'
     , 'total_pitch_class_histogram'
-    , 'bar_pitch_class_histogram'
     , 'pitch_range'
     ])
 
-# Process First Dataset metrics
 set1_eval = copy.deepcopy(evalset)
-# print('set1')
-# pprint(set1[:num_samples])
-for i in range(0, num_samples):
-    feature = core.extract_feature(set1[i])
-    for metric in metrics_list:
-        evaluator = getattr(core.metrics(), metric)
-        if metric in single_arg_metrics:
-            set1_eval[metric][i] = evaluator(feature)
-        else:
-            set1_eval[metric][i] = evaluator(feature, 0)
-# print('metric_set')
-# pprint(set1_eval)
-
-# Process First Dataset metrics
 set2_eval = copy.deepcopy(evalset)
-# print('set2')
-# pprint(set2[:num_samples])
-for i in range(0, num_samples):
-    feature = core.extract_feature(set2[i])
-    for metric in metrics_list:
-        evaluator = getattr(core.metrics(), metric)
-        if metric in single_arg_metrics:
-            set2_eval[metric][i] = evaluator(feature)
-        else:
-            set2_eval[metric][i] = evaluator(feature, 0)
-# print('metric_set')
-# pprint(set2_eval)
+
+sets = [ (set1, set1_eval), (set2, set2_eval) ]
+
+
+# Extract Fetures
+for _set, _set_eval in sets:
+  for i in range(0, num_samples):
+      feature = core.extract_feature(_set[i])
+      for metric in metrics_list:
+          evaluator = getattr(core.metrics(), metric)
+          if metric in single_arg_metrics:
+              tmp = evaluator(feature)
+          elif metric in bar_metrics:
+              print(metric)
+              tmp = evaluator(feature, 0, args.num_bar)
+              print(tmp.shape)
+          else:
+              tmp = evaluator(feature, 0)
+          _set_eval[metric][i] = tmp
 
 loo = LeaveOneOut()
 loo.get_n_splits(np.arange(num_samples))
@@ -121,6 +127,11 @@ for i, metric in enumerate(metrics_list):
 
     mean = np.mean(set1_eval[metric], axis=0).tolist()
     std = np.std(set1_eval[metric], axis=0).tolist()
+
+    print(metric)
+    pprint(plot_set1_intra[i])
+    pprint(plot_set2_intra[i])
+    pprint(plot_sets_inter[i])
 
     kl1 = utils.kl_dist(plot_set1_intra[i], plot_sets_inter[i])
     ol1 = utils.overlap_area(plot_set1_intra[i], plot_sets_inter[i])

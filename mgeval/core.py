@@ -173,7 +173,7 @@ class metrics(object):
         histogram = histogram / sum(histogram)
         return histogram
 
-    def bar_pitch_class_histogram(self, feature, track_num=1, bpm=120, num_bar=None):
+    def bar_pitch_class_histogram(self, feature, track_num=1, num_bar=None, bpm=120):
         """
         bar_pitch_class_histogram (Pitch class histogram per bar):
 
