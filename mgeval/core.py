@@ -65,6 +65,8 @@ class metrics(object):
                 else:
                     used_notes = np.zeros((num_bar, 1))
 
+            
+
             elif type(pattern[track_num][i]) == midi.events.NoteOnEvent and pattern[track_num][i].data[1] != 0:
                 if 'time_sig' not in locals():  # set default bar length as 4 beat
                     bar_length = 4 * resolution
@@ -87,7 +89,11 @@ class metrics(object):
                         else:
                             note_list = []
                     note_list.append(pattern[track_num][i].data[0])
-                    used_notes[pattern[track_num][i].tick / bar_length] += 1
+                    idx = pattern[track_num][i].tick / bar_length
+                    if idx >= num_bar:
+                      continue
+                    used_notes[idx] += 1
+                    # used_notes[pattern[track_num][i].tick / bar_length] += 1
 
         used_pitch = np.zeros((num_bar, 1))
         current_note = 0
@@ -153,7 +159,10 @@ class metrics(object):
                         used_notes[pattern[track_num][i].tick / bar_length] += 1
 
                 else:
-                    used_notes[pattern[track_num][i].tick / bar_length] += 1
+                    idx = pattern[track_num][i].tick / bar_length
+                    if idx >= num_bar:
+                      continue
+                    used_notes[idx] += 1
         return used_notes
 
     def total_pitch_class_histogram(self, feature):

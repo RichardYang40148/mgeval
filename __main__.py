@@ -40,16 +40,16 @@ print(num_samples)
 evalset = { 
             'total_used_pitch': np.zeros((num_samples, 1))
           , 'pitch_range': np.zeros((num_samples, 1))
-          # , 'avg_pitch_shift': np.zeros((num_samples, 1))
+          , 'avg_pitch_shift': np.zeros((num_samples, 1))
           , 'avg_IOI': np.zeros((num_samples, 1))
-          # , 'total_used_note': np.zeros((num_samples, 1))
-          # , 'bar_used_pitch': np.zeros((num_samples, args.num_bar, 1, 1))
-          # , 'bar_used_note': np.zeros((num_samples, args.num_bar, 1))
+          , 'total_used_note': np.zeros((num_samples, 1))
+          , 'bar_used_pitch': np.zeros((num_samples, args.num_bar, 1))
+          , 'bar_used_note': np.zeros((num_samples, args.num_bar, 1))
           , 'total_pitch_class_histogram': np.zeros((num_samples, 12))
           , 'bar_pitch_class_histogram': np.zeros((num_samples, args.num_bar, 12))
           , 'note_length_hist': np.zeros((num_samples, 12))
           , 'pitch_class_transition_matrix': np.zeros((num_samples, 12, 12))
-          # , 'note_length_transition_matrix': np.zeros((num_samples, 12, 12))
+          , 'note_length_transition_matrix': np.zeros((num_samples, 12, 12))
           }
 
 bar_metrics = [ 'bar_used_pitch', 'bar_used_note', 'bar_pitch_class_histogram' ]
@@ -85,9 +85,9 @@ for _set, _set_eval in sets:
           if metric in single_arg_metrics:
               tmp = evaluator(feature)
           elif metric in bar_metrics:
-              print(metric)
+              # print(metric)
               tmp = evaluator(feature, 0, args.num_bar)
-              print(tmp.shape)
+              # print(tmp.shape)
           else:
               tmp = evaluator(feature, 0)
           _set_eval[metric][i] = tmp
