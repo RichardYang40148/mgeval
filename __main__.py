@@ -9,8 +9,6 @@ import numpy as np
 import pretty_midi
 from pprint import pprint
 import pickle
-# import seaborn as sns
-# import matplotlib.pyplot as plt
 from mgeval import core, utils
 from sklearn.model_selection import LeaveOneOut
 
@@ -30,8 +28,17 @@ args = parser.parse_args()
 set1 = glob.glob(os.path.join(args.set1dir, '*'))
 set2 = glob.glob(os.path.join(args.set2dir, '*'))
 
+print('Evaluation sets (sample and baseline):')
 print(set1)
 print(set2)
+
+if not any(set1):
+  print("Error: sample set it empty")
+  exit()
+
+if not any(set2):
+  print("Error: baseline set it empty")
+  exit()
 
 # Initialize Evaluation Set
 num_samples = min(len(set2), len(set1))
