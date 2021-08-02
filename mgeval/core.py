@@ -65,6 +65,8 @@ class metrics(object):
                 else:
                     used_notes = np.zeros((num_bar, 1))
 
+            
+
             elif type(pattern[track_num][i]) == midi.events.NoteOnEvent and pattern[track_num][i].data[1] != 0:
                 if 'time_sig' not in locals():  # set default bar length as 4 beat
                     bar_length = 4 * resolution
@@ -87,7 +89,11 @@ class metrics(object):
                         else:
                             note_list = []
                     note_list.append(pattern[track_num][i].data[0])
-                    used_notes[pattern[track_num][i].tick / bar_length] += 1
+                    idx = pattern[track_num][i].tick / bar_length
+                    if idx >= num_bar:
+                      continue
+                    used_notes[idx] += 1
+                    # used_notes[pattern[track_num][i].tick / bar_length] += 1
 
         used_pitch = np.zeros((num_bar, 1))
         current_note = 0
@@ -153,7 +159,10 @@ class metrics(object):
                         used_notes[pattern[track_num][i].tick / bar_length] += 1
 
                 else:
-                    used_notes[pattern[track_num][i].tick / bar_length] += 1
+                    idx = pattern[track_num][i].tick / bar_length
+                    if idx >= num_bar:
+                      continue
+                    used_notes[idx] += 1
         return used_notes
 
     def total_pitch_class_histogram(self, feature):
@@ -173,7 +182,7 @@ class metrics(object):
         histogram = histogram / sum(histogram)
         return histogram
 
-    def bar_pitch_class_histogram(self, feature, track_num=1, bpm=120, num_bar=None):
+    def bar_pitch_class_histogram(self, feature, track_num=1, num_bar=None, bpm=120):
         """
         bar_pitch_class_histogram (Pitch class histogram per bar):
 
@@ -207,6 +216,7 @@ class metrics(object):
             bar_length = int(math.ceil(bar_length))
 
         if actual_bar > num_bar:
+            mod = np.mod(len(piano_roll), bar_length*128)
             piano_roll = piano_roll[:-np.mod(len(piano_roll), bar_length)].reshape((num_bar, -1, 128))  # make exact bar
         elif actual_bar == num_bar:
             piano_roll = piano_roll.reshape((num_bar, -1, 128))
@@ -285,7 +295,10 @@ class metrics(object):
         pattern.make_ticks_abs()
         resolution = pattern.resolution
         total_used_note = self.total_used_note(feature, track_num=track_num)
-        d_note = np.zeros((total_used_note - 1))
+        d_note = np.zeros((max(total_used_note - 1, 0)))
+        # if total_used_note == 0:
+          # return 0
+        # d_note = np.zeros((total_used_note - 1))
         current_note = 0
         counter = 0
         for i in range(0, len(pattern[track_num])):

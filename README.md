@@ -34,13 +34,30 @@ The toolbox propose a set of musically informed objective measures to obtain ana
 3. Note length histogram: To extract the note length histogram, we first define a set of allowable beat length classes [full, half, quarter, 8th, 16th, dot half, dot quarter, dot 8th, dot 16th, half note triplet, quarter note triplet, 8th note triplet]. The rest option, when activated, will double the vector size to represent the same lengths for rests. The classification of each event is performed by dividing the basic unit into the length of (barlength)/96, and each note length is quantized to the closest length category. The output vector has a length of either 12 or 24, respectively.
 4. Note length transition matrix: Similar to the pitch class transition matrix, the note length tran- sition matrix provides useful information for rhythm description. The output feature dimension is 12 × 12 or 24 × 24, respectively.
 
-### Dependency
+### Dependencies
+---
  * [`scipy`](http://www.scipy.org/)
  * [`numpy`](http://www.numpy.org)
  * [`pretty-midi`](https://github.com/craffel/pretty-midi)
  * [`python-midi`](https://github.com/vishnubob/python-midi)
  * [`sklearn`](https://scikit-learn.org/stable/)
- ### To use
- Detailed documentation included [here](https://github.com/RichardYang40148/mgeval/blob/master/mgeval/documentation.md).
- 
- Demonstration of metrics included in [demo.ipynb](https://github.com/RichardYang40148/mgeval/commits?author=RichardYang40148)
+ * [`pickle`](https://docs.python.org/3/library/pickle.html) (optional)
+
+### To use
+---
+
+#### Library Reference
+
+Detailed documentation included [here](https://github.com/RichardYang40148/mgeval/blob/master/mgeval/documentation.md).
+
+Demonstration of metrics included in [demo.ipynb](https://github.com/RichardYang40148/mgeval/commits?author=RichardYang40148)
+
+#### Standalone Module
+
+You can run mgeval as a standalone module with the following command on the root directory:
+
+```shell
+python . <path/to/first/sample/directory> <path/to/second/sample/directory> <output_filename>
+```
+
+Provided both directories exist and contain valid MIDI files, this script calculates all available metrics for each set and save the result to `output_filename`, as a pickle.
